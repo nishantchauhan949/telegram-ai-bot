@@ -2,10 +2,11 @@ import os
 
 import openai
 from dotenv import load_dotenv
+from settings import OPENAI_API_KEY
 
 load_dotenv('.env')
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
 # models = openai.Model.list()
 
 completion = openai.ChatCompletion.create(

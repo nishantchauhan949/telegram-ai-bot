@@ -1,46 +1,11 @@
-import os
+#!/usr/bin/env python
 
-import requests
 import telebot
-from bardapi.core import Bard
-from dotenv import load_dotenv
 
-load_dotenv('.env')
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-BARD_API_KEY = os.environ.get('BARD_API_KEY')
+from bard_conversation import get_response_from_bard
+from settings import BOT_TOKEN
 
 bot = telebot.TeleBot(BOT_TOKEN)
-
-session = requests.Session()
-session.headers = {
-    "Host": "bard.google.com",
-    "X-Same-Domain": "1",
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
-    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-    "Origin": "https://bard.google.com",
-    "Referer": "https://bard.google.com/",
-}
-session.cookies.set("__Secure-1PSID", BARD_API_KEY)
-bard = Bard(session=session, timeout=30, token=BARD_API_KEY)
-
-
-def get_response_from_bard(input_text):
-    """
-    The get_response_from_bard function takes in a string of text and returns the response from the BARD API.
-        Args:
-            input_text (str): The user's question to be sent to the BARD API.
-
-    Args:
-
-    Returns:
-        A dictionary
-
-    Doc Author:
-        Trelent
-    """
-    # Send an API request and get a response.
-    response = bard.get_answer(input_text)
-    return response['content']
 
 
 @bot.message_handler(content_types=['text'], commands=['ask'])
@@ -105,4 +70,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
