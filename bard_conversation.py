@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from requests import Session
 from bardapi.core import Bard
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # pylint: disable=unused-argument, wrong-import-position
-# This program is dedicated to the public domain under the CC0 license.
 
 """
 First, a few callback functions are defined. Then, those functions are passed to
