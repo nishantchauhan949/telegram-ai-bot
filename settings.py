@@ -2,8 +2,11 @@ import logging
 import os
 
 from dotenv import load_dotenv
+from httpx._config import logger as httpx_logger
 
 load_dotenv('.env')
+
+httpx_logger.setLevel(logging.WARNING)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
