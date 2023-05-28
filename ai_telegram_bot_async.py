@@ -44,7 +44,7 @@ BARD_QUERY, BARD_QUERY_RECURSION = range(2)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name='') -> int:
     """
     The start function is the first function that will be called when a user interacts with the bot.
-    It's purpose is to send a message to the user, and then return an integer value representing which
+    Its purpose is to send a message to the user, and then return an integer value representing which
     state we want our conversation handler to move into next. In this case, we are returning BARD_QUERY,
     which means that after sending this message, our conversation handler will call bard_query_handler().
 
@@ -54,7 +54,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name=''
         context: ContextTypes.DEFAULT_TYPE: Pass the context of the message
 
     Returns:
-        This function
+        bard_query_handler()
 
     Doc Author:
         Trelent
@@ -85,7 +85,7 @@ async def bard_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         context: ContextTypes.DEFAULT_TYPE: Pass the context of the conversation
 
     Returns:
-        ConversationHandler.END
+        ConversationHandler
 
     Doc Author:
         Trelent
@@ -120,7 +120,7 @@ async def cancel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         context: ContextTypes.DEFAULT_TYPE: Pass the context of the conversation
 
     Returns:
-        Conversationhandler
+        ConversationHandler
 
     Doc Author:
         Trelent
@@ -137,7 +137,7 @@ async def cancel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return ConversationHandler.END
 
 
-async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     The unknown function is a fallback function that will be called when the bot receives an unknown command.
     It simply sends a message to the user saying &quot;Sorry, I didn't understand that command.&quot;
