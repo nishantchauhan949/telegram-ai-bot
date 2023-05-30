@@ -56,27 +56,27 @@ class BardAsync(Bard):
 
     async def get_answer(self, input_text: str) -> dict:
         """
-                Get the answer from Bard based on the input text.
+        Get the answer from Bard based on the input text.
 
-                Example:
-                >>> token = 'xxxxxxxxxx'
-                >>> bard = Bard(token=token)
-                >>> response = bard.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
-                >>> print(response['content'])
+        Example:
+        >>> token = 'xxxxxxxxxx'
+        >>> bard = Bard(token=token)
+        >>> response = bard.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
+        >>> print(response['content'])
 
-                :param input_text: (`str`)
-                    The input text for which the answer is requested.
+        :param input_text: (`str`)
+            The input text for which the answer is requested.
 
-                :return: (`dict`)
-                    The dictionary containing the response from Bard with the following keys:
-                    - "content": The content of the answer.
-                    - "conversation_id": The conversation ID.
-                    - "response_id": The response ID.
-                    - "factualityQueries": Factuality queries (if any).
-                    - "textQuery": The text query used for the answer.
-                    - "choices": The choices available (if any).
-                    - "status_code": Response Status code,
-                """
+        :return: (`dict`)
+            The dictionary containing the response from Bard with the following keys:
+            - "content": The content of the answer.
+            - "conversation_id": The conversation ID.
+            - "response_id": The response ID.
+            - "factualityQueries": Factuality queries (if any).
+            - "textQuery": The text query used for the answer.
+            - "choices": The choices available (if any).
+            - "status_code": Response Status code,
+        """
         if not isinstance(self.SNlM0e, str):
             self.SNlM0e = await self.SNlM0e
         params = {
