@@ -35,7 +35,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from settings import BOT_TOKEN, logger
+from config.settings import BOT_TOKEN, logger
 from bard_conversation import get_response_from_bard
 
 BARD_QUERY, BARD_QUERY_RECURSION = range(2)
@@ -99,7 +99,7 @@ async def bard_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
             logger.info(f'{prepend} User ended the conversation')
             return ConversationHandler.END
         logger.info(f'{prepend} User Query :: {user_query}')
-        bard_response = get_response_from_bard(input_text=user_query, func_name=func_name)
+        bard_response = await get_response_from_bard(input_text=user_query, func_name=func_name)
         logger.info(f'{prepend} Response :: {bard_response}')
         await update.message.reply_text(text="Here's your response!")
         await update.message.reply_text(text=bard_response)
@@ -184,7 +184,7 @@ def main() -> None:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler(command=['start', 'ask'], callback=start)],
             states={
-                BARD_QUERY: [MessageHandler(filters=filters.TEXT & ~filters.COMMAND,
+                BARD_QUERY: [MessageHandler(filters=filters.ALL,
                                             callback=bard_query_handler)],
                 BARD_QUERY_RECURSION: [MessageHandler(filters=filters.TEXT & ~filters.COMMAND,
                                                       callback=bard_query_handler)],

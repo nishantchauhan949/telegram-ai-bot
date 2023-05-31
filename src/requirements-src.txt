@@ -1,0 +1,3 @@
+httpx[http2]
+python-telegram-bot[all]
+git+https://github.com/dsdanielpark/Bard-API.git
