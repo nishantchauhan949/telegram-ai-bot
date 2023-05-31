@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from httpx._config import logger as httpx_logger
 
-load_dotenv('.env')
+load_dotenv('../.env')
 
 httpx_logger.setLevel(logging.WARNING)
 

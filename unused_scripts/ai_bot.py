@@ -2,8 +2,8 @@
 
 import telebot
 
-from bard_conversation import get_response_from_bard
-from settings import BOT_TOKEN
+from src.bard_conversation import get_response_from_bard
+from config.settings import BOT_TOKEN
 
 bot = telebot.TeleBot(BOT_TOKEN)
 

@@ -1,10 +1,8 @@
-import os
-
 import openai
 from dotenv import load_dotenv
-from settings import OPENAI_API_KEY
+from config.settings import OPENAI_API_KEY
 
-load_dotenv('.env')
+load_dotenv('../.env')
 
 openai.api_key = OPENAI_API_KEY
 # models = openai.Model.list()
