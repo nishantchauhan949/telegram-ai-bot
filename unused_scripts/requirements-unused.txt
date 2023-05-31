@@ -4,3 +4,4 @@ git+https://github.com/dsdanielpark/Bard-API.git
 openai
 requests
 pyTelegramBotAPI
+python-dotenv
