@@ -1,3 +1,9 @@
+"""
+Using bardapi, which is licensed under the MIT License.
+More information about the license can be found in the Bard-API license file:
+https://github.com/dsdanielpark/Bard-API/blob/main/LICENSE
+"""
+
 import json
 import os
 import random
