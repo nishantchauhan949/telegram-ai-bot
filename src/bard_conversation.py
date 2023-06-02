@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import asyncio
 
-from core_async import BardAsync
+from src.core_async import BardAsync
 from config.settings import BARD_API_KEY, logger
 
 bard = BardAsync(timeout=30, token=BARD_API_KEY)
