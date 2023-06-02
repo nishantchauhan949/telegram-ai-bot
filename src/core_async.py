@@ -5,14 +5,14 @@ import string
 from re import search
 
 from bardapi.constants import ALLOWED_LANGUAGES, SESSION_HEADERS
-from bardapi.core import Bard
 from deep_translator import GoogleTranslator
 from httpx import AsyncClient
 
 
 class BardAsync:
     """
-    Bard class for interacting with the Bard API.
+    Bard class for interacting with the Bard API using httpx[http2]
+    Tested and working (could break in the future, if not kept up to date)
     """
 
     def __init__(
@@ -39,7 +39,7 @@ class BardAsync:
         self.conversation_id = ""
         self.response_id = ""
         self.choice_id = ""
-        # Set session
+        # Making Httpx Async Client that will be used for all API calls
         self.client = AsyncClient(
             http2=True,
             headers=SESSION_HEADERS,
@@ -57,8 +57,8 @@ class BardAsync:
 
         Example:
         >>> token = 'xxxxxxxxxx'
-        >>> bard = Bard(token=token)
-        >>> response = bard.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
+        >>> bard = BardAsync(token=token)
+        >>> response = await bard.get_answer("나와 내 동년배들이 좋아하는 뉴진스에 대해서 알려줘")
         >>> print(response['content'])
 
         Args:
@@ -146,7 +146,7 @@ class BardAsync:
             # TODO:
             #  handle exception using logging instead
             code = None
-            # print(f"Either code is not present or unable to parse code from the response: {e}")
+            print(f"Unable to parse answer from the response: {e}")
 
         # Returned dictionary object
         bard_answer = {
