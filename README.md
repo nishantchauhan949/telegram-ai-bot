@@ -43,3 +43,29 @@ python3 -m src.ai_telegram_bot_async
 ```
 
 <br>
+
+## Third-Party Package: Bard-API
+
+Bard-API is a powerful Python library that provides functionality for using Bard's webserver for getting your answers.
+
+The Bard-API library is released under the MIT License. Please refer to the ExamplePackage's license file for detailed terms and conditions.
+
+For more information about Bard-API, please visit the [Bard-API GitHub repository](https://github.com/dsdanielpark/Bard-API).
+
+<br>
+
+## Shifting Service Policies: Bard and Google's Dynamics 
+Bard's service status and Google's API interfaces are in constant flux. *The number of replies is currently limited, but certain users,* such as those utilizing VPNs or proxy servers, have reported slightly higher message caps. Adaptability is crucial in navigating these dynamic service policies. Please note that the cookie values used in this package are not official API values.
+
+<br>
+
+### Important Notice
+  The user assumes all legal responsibilities associated with using the BardAPI package and Telegram-AI-bot project. This Python project merely facilitates easy access to Google Bard Telegram Bot for developers. Users are solely responsible for managing data and using the package appropriately. For further information, please consult the Google Bard Official Documentation.
+    
+### Caution
+This Python project is not an official Google package or API service. It is not affiliated with Google and uses Google account cookies, which means that excessive or commercial usage may result in restrictions on your Google account. The project was created to support developers in testing functionalities due to delays in the official Google package. However, it should not be misused or abused. Please be cautious and refer to the Readme for more information.
+  
+
+## License
+
+This project is licensed under the GNU General Public License (GPL) version 3.0. By using, contributing, or redistributing this project, you agree to abide by the terms and conditions of the GPL. You can find a copy of the license in the [LICENSE](LICENSE) file.
