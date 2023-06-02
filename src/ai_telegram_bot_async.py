@@ -36,7 +36,7 @@ from telegram.ext import (
     filters,
 )
 from config.settings import BOT_TOKEN, logger
-from bard_conversation import get_response_from_bard
+from src.bard_conversation import get_response_from_bard
 
 BARD_QUERY, BARD_QUERY_RECURSION = range(2)
 
