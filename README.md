@@ -48,7 +48,7 @@ python3 -m src.ai_telegram_bot_async
 
 Bard-API is a powerful Python library that provides functionality for using Bard's webserver for getting your answers.
 
-The Bard-API library is released under the MIT License. Please refer to the ExamplePackage's license file for detailed terms and conditions.
+The Bard-API library is released under the MIT License. Please refer to the Bard-API's license file for detailed terms and conditions.
 
 For more information about Bard-API, please visit the [Bard-API GitHub repository](https://github.com/dsdanielpark/Bard-API).
 
