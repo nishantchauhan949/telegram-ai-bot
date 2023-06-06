@@ -1,5 +1,0 @@
-include telegram_ai_bot/LICENSE
-include telegram_ai_bot/README.md
-include telegram_ai_bot/requirements.txt
-include telegram_ai_bot/src/requirements-src.txt
-include telegram_ai_bot/unused_scripts/requirements-unused.txt

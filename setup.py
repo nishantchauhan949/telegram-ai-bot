@@ -22,7 +22,6 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/nishantchauhan949/telegram-ai-bot",
     packages=find_packages(exclude=['*.env', '*/__pycache__/*', '*.pyc']),
-    include_package_data=False,  # Change it to True if you want to include files mentioned in MANIFEST.in
     python_requires=">=3.7",
     install_requires=[
         "httpx[http2]",
