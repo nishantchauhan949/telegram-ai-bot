@@ -28,7 +28,7 @@ Cookie value subject to frequent changes. Verify the value again if an error occ
 <br>
 
 ## Create .env file
-Creating .env file at the base directory from which the **BOT_TOKEN** and **BARD_API_KEY** will be fetched.
+Creating .env file inside **telegram_ai_bot/** directory from which the **BOT_TOKEN** and **BARD_API_KEY** will be fetched.
 ```env
 BOT_TOKEN=xxxxxxxxxx
 BARD_API_KEY=xxxxxxxxxx
@@ -39,7 +39,7 @@ BARD_API_KEY=xxxxxxxxxx
 ## Usage 
 From the base directory run:
 ```bash
-python3 -m src.ai_telegram_bot_async
+python3 -m telegram_ai_bot.src.ai_telegram_bot_async
 ```
 
 <br>
