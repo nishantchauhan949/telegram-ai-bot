@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from httpx._config import logger as httpx_logger
 
-load_dotenv('.env')
+load_dotenv('../.env')
 
 httpx_logger.setLevel(logging.WARNING)
 
@@ -16,3 +16,5 @@ logger = logging.getLogger(__name__)
 BARD_API_KEY = os.environ.get('BARD_API_KEY')
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+print(BOT_TOKEN)
