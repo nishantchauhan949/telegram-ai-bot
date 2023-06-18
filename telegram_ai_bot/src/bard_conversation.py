@@ -25,7 +25,7 @@ async def get_response_from_bard(input_text, func_name='') -> str:
     func_name = func_name + '.get_response_from_bard()' if func_name else 'get_response_from_bard()'
     prepend = f'{func_name} :: '
     try:
-        input_text += '\nPlease refrain from using any images.'
+        # input_text += '\nPlease refrain from using any images.'
         # Send an API request and get a response.
         response = await bard.get_answer(input_text)
         # print(f"{response['content']}\n\n")

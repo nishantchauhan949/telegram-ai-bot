@@ -37,8 +37,9 @@ from telegram.ext import (
 )
 from telegram_ai_bot.config.settings import BOT_TOKEN, logger
 from telegram_ai_bot.src.bard_conversation import get_response_from_bard
+from telegram_ai_bot.src.chatgpt_apis import get_response_from_chatgpt
 
-BARD_QUERY, BARD_QUERY_RECURSION = range(2)
+BARD_QUERY, BARD_QUERY_RECURSION, CHATGPT_QUERY, CHATGPT_QUERY_RECURSION, BARD_OR_CHATGPT = range(5)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name='') -> int:
@@ -67,7 +68,28 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name=''
         await update.message.reply_text(
             text="Please ask the AI bot.\n\nYou can send /cancel or /stop at any point end the conversation."
         )
-        return BARD_QUERY
+
+        return BARD_OR_CHATGPT
+    except Exception as e:
+        logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
+        return ConversationHandler.END
+
+
+async def bard_or_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    func_name = 'bard_or_chatgpt()'
+    try:
+        user = update.message.from_user.first_name
+        prepend = f'{user} :: {func_name},'
+        user_query = update.message.text
+        if user_query == '/bard':
+            logger.info(f'{prepend} User wants to chat with Bard')
+            return BARD_QUERY
+        elif user_query == '/chatgpt':
+            logger.info(f'{prepend} User wants to chat with ChatGPT')
+            return CHATGPT_QUERY
+        else:
+            logger.info(f'{prepend} User ended the conversation')
+            return ConversationHandler.END
     except Exception as e:
         logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
         return ConversationHandler.END
@@ -104,6 +126,42 @@ async def bard_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text(text="Here's your response!")
         await update.message.reply_text(text=bard_response)
         return BARD_QUERY_RECURSION
+    except Exception as e:
+        logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
+        return ConversationHandler.END
+
+
+async def chatgpt_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    The chatgpt_query_handler function is a conversation handler that takes in user input
+    and returns the response from BARD.
+        The function will continue to take in user input until the user types '/stop' or '/cancel'.
+
+
+    Args:
+        update: Update: Access the update object, which contains information about the incoming message
+        context: ContextTypes.DEFAULT_TYPE: Pass the context of the conversation
+
+    Returns:
+        ConversationHandler
+
+    Doc Author:
+        Trelent
+    """
+    func_name = 'chatgpt_query_handler()'
+    try:
+        user = update.message.from_user.first_name
+        prepend = f'{user} :: {func_name},'
+        user_query = update.message.text
+        if user_query in ['/stop', '/cancel']:
+            logger.info(f'{prepend} User ended the conversation')
+            return ConversationHandler.END
+        logger.info(f'{prepend} User Query :: {user_query}')
+        chatgpt_response = await get_response_from_chatgpt(input_text=user_query, func_name=func_name)
+        logger.info(f'{prepend} Response :: {chatgpt_response}')
+        await update.message.reply_text(text="Here's your response!")
+        await update.message.reply_text(text=chatgpt_response)
+        return CHATGPT_QUERY_RECURSION
     except Exception as e:
         logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
         return ConversationHandler.END
@@ -184,10 +242,15 @@ def main() -> None:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler(command=['start', 'ask'], callback=start)],
             states={
+                BARD_OR_CHATGPT: [CommandHandler(command=['bard', 'chatgpt'], callback=bard_or_chatgpt)],
                 BARD_QUERY: [MessageHandler(filters=filters.ALL,
                                             callback=bard_query_handler)],
                 BARD_QUERY_RECURSION: [MessageHandler(filters=filters.TEXT & ~filters.COMMAND,
                                                       callback=bard_query_handler)],
+                CHATGPT_QUERY: [MessageHandler(filters=filters.ALL,
+                                               callback=chatgpt_query_handler)],
+                CHATGPT_QUERY_RECURSION: [MessageHandler(filters=filters.TEXT & ~filters.COMMAND,
+                                                         callback=chatgpt_query_handler)],
             },
             fallbacks=[CommandHandler(command=['stop', 'cancel'], callback=cancel_handler),
                        MessageHandler(filters=filters.COMMAND, callback=unknown)],
