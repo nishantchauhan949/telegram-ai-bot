@@ -65,8 +65,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name=''
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
         logger.info(f'{prepend} Start prompt received from user')
+        text = """Please choose either /bard or /chatgpt, based on your preference.
+        
+Some things to note:
+1. Bard can crawl the web to get latest information available but it can hallucinate.
+2. ChatGPT cannot crawl the web and it's data cut off was Sept 2021, but responses from ChatGPT are generally better.
+3. You can use /stop and /cancel at any time to end the conversation."""
         await update.message.reply_text(
-            text="Please ask the AI bot.\n\nYou can send /cancel or /stop at any point end the conversation."
+            text=text,
         )
 
         return BARD_OR_CHATGPT
@@ -83,9 +89,15 @@ async def bard_or_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         user_query = update.message.text
         if user_query == '/bard':
             logger.info(f'{prepend} User wants to chat with Bard')
+            await update.message.reply_text(
+                text="Bard will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
+            )
             return BARD_QUERY
         elif user_query == '/chatgpt':
             logger.info(f'{prepend} User wants to chat with ChatGPT')
+            await update.message.reply_text(
+                text="ChatGPT will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
+            )
             return CHATGPT_QUERY
         else:
             logger.info(f'{prepend} User ended the conversation')
