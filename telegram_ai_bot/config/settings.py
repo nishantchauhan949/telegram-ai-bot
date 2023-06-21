@@ -8,10 +8,12 @@ load_dotenv('../.env')
 
 httpx_logger.setLevel(logging.WARNING)
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+fh = logging.FileHandler('bot_log.log')
+fh.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+logger.addHandler(fh)
 
 BARD_API_KEY = os.environ.get('BARD_API_KEY')
 BOT_TOKEN = os.environ.get('BOT_TOKEN')

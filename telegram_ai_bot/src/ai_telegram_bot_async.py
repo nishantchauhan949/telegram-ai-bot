@@ -69,8 +69,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name=''
         
 Some things to note:
 1. Bard can crawl the web to get latest information available but it can hallucinate.
+
 2. ChatGPT cannot crawl the web and it's data cut off was Sept 2021, but responses from ChatGPT are generally better.
-3. You can use /stop and /cancel at any time to end the conversation."""
+
+3. Hallucination rate: Bard > ChatGPT
+
+4. You can use /stop and /cancel at any time to end the conversation."""
         await update.message.reply_text(
             text=text,
         )

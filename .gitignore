@@ -5,3 +5,4 @@ __pycache__/
 dist/
 build/
 telegram_ai_bot.egg-info/
+*.log
