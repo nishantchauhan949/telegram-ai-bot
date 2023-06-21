@@ -41,6 +41,11 @@ from telegram_ai_bot.src.chatgpt_apis import get_response_from_chatgpt
 
 BARD_QUERY, BARD_QUERY_RECURSION, CHATGPT_QUERY, CHATGPT_QUERY_RECURSION, BARD_OR_CHATGPT = range(5)
 
+BARD_PROMPT = '/bard'
+CHATGPT_PROMPT = '/chatgpt'
+STOP_PROMPT = '/stop'
+CANCEL_PROMPT = '/cancel'
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name='') -> int:
     """
@@ -91,13 +96,13 @@ async def bard_or_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
         user_query = update.message.text
-        if user_query == '/bard':
+        if user_query.startswith(BARD_PROMPT) or user_query.endswith(BARD_PROMPT):
             logger.info(f'{prepend} User wants to chat with Bard')
             await update.message.reply_text(
                 text="Bard will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
             )
             return BARD_QUERY
-        elif user_query == '/chatgpt':
+        elif user_query.startswith(CHATGPT_PROMPT) or user_query.endswith(CHATGPT_PROMPT):
             logger.info(f'{prepend} User wants to chat with ChatGPT')
             await update.message.reply_text(
                 text="ChatGPT will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
@@ -133,8 +138,10 @@ async def bard_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
         user_query = update.message.text
-        if user_query in ['/stop', '/cancel']:
+        if user_query.startswith(STOP_PROMPT) or user_query.endswith(STOP_PROMPT) or \
+                user_query.startswith(CANCEL_PROMPT) or user_query.endswith(CANCEL_PROMPT):
             logger.info(f'{prepend} User ended the conversation')
+            await cancel_handler(update=update, context=context)
             return ConversationHandler.END
         logger.info(f'{prepend} User Query :: {user_query}')
         bard_response = await get_response_from_bard(input_text=user_query, func_name=func_name)
@@ -169,8 +176,10 @@ async def chatgpt_query_handler(update: Update, context: ContextTypes.DEFAULT_TY
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
         user_query = update.message.text
-        if user_query in ['/stop', '/cancel']:
+        if user_query.startswith(STOP_PROMPT) or user_query.endswith(STOP_PROMPT) or \
+                user_query.startswith(CANCEL_PROMPT) or user_query.endswith(CANCEL_PROMPT):
             logger.info(f'{prepend} User ended the conversation')
+            await cancel_handler(update=update, context=context)
             return ConversationHandler.END
         logger.info(f'{prepend} User Query :: {user_query}')
         chatgpt_response = await get_response_from_chatgpt(input_text=user_query, func_name=func_name)
@@ -261,15 +270,14 @@ def main() -> None:
                 BARD_OR_CHATGPT: [CommandHandler(command=['bard', 'chatgpt'], callback=bard_or_chatgpt)],
                 BARD_QUERY: [MessageHandler(filters=filters.ALL,
                                             callback=bard_query_handler)],
-                BARD_QUERY_RECURSION: [MessageHandler(filters=filters.TEXT & ~filters.COMMAND,
+                BARD_QUERY_RECURSION: [MessageHandler(filters=filters.ALL,
                                                       callback=bard_query_handler)],
                 CHATGPT_QUERY: [MessageHandler(filters=filters.ALL,
                                                callback=chatgpt_query_handler)],
-                CHATGPT_QUERY_RECURSION: [MessageHandler(filters=filters.TEXT & ~filters.COMMAND,
+                CHATGPT_QUERY_RECURSION: [MessageHandler(filters=filters.ALL,
                                                          callback=chatgpt_query_handler)],
             },
-            fallbacks=[CommandHandler(command=['stop', 'cancel'], callback=cancel_handler),
-                       MessageHandler(filters=filters.COMMAND, callback=unknown)],
+            fallbacks=[CommandHandler(command=['stop', 'cancel'], callback=cancel_handler), ],
         )
 
         unknown_handler = MessageHandler(filters=filters.COMMAND, callback=unknown)
