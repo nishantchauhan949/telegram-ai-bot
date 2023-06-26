@@ -12,8 +12,11 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 fh = logging.FileHandler('bot_log.log')
+sh = logging.StreamHandler()
 fh.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+sh.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 logger.addHandler(fh)
+logger.addHandler(sh)
 
 BARD_API_KEY = os.environ.get('BARD_API_KEY')
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
