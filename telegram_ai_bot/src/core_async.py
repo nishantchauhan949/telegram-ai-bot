@@ -121,8 +121,8 @@ class BardAsync:
             cookies={"__Secure-1PSID": self.token},
         )
 
-        logger.info(f'{func_name} :: resp -> {resp}')
-        logger.info(f'{func_name} :: resp.content -> {resp.content}')
+        # logger.info(f'{func_name} :: resp -> {resp}')
+        # logger.info(f'{func_name} :: resp.content -> {resp.content}')
 
         # Post-processing of response
         resp_dict = json.loads(resp.content.splitlines()[3])[0][2]
@@ -146,7 +146,7 @@ class BardAsync:
 
         print('\n*********************************************************\n')
         print(parsed_answer)
-        logger.info(f'{func_name} :: parsed_answer -> {parsed_answer}')
+        # logger.info(f'{func_name} :: parsed_answer -> {parsed_answer}')
         print('\n*********************************************************\n')
 
         # Translated by Google Translator (optional)
@@ -203,7 +203,7 @@ class BardAsync:
 
         print('\n*********************************************************\n')
         print(bard_answer)
-        logger.info(f'{func_name} :: bard_answer -> {bard_answer}')
+        # logger.info(f'{func_name} :: bard_answer -> {bard_answer}')
         print('\n*********************************************************\n')
 
         return bard_answer
