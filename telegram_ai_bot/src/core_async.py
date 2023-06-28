@@ -156,11 +156,11 @@ class BardAsync:
 
         # Returned dictionary object
         bard_answer = {
-            "content": parsed_answer[0][0],
+            "content": parsed_answer[4][0][1][0],
             "conversation_id": parsed_answer[1][0],
             "response_id": parsed_answer[1][1],
-            "factualityQueries": parsed_answer[3],
-            "textQuery": parsed_answer[2][0] if parsed_answer[2] else "",
+            "factualityQueries": parsed_answer[2],
+            "textQuery": parsed_answer[2][0][0] if parsed_answer[2] else "",
             "choices": [{"id": x[0], "content": x[1]} for x in parsed_answer[4]],
             "links": self._extract_links(parsed_answer[4]),
             "images": images,
@@ -188,7 +188,6 @@ class BardAsync:
                 # TODO:
                 #  handle exception using logging instead
                 print(f"Unable to execute the code: {e}")
-
         return bard_answer
 
     async def _get_snim0e(self):

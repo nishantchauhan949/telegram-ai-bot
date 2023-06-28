@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import asyncio
 
-from telegram_ai_bot.src.core_async import BardAsync
+from bardapi import BardAsync
+
 from telegram_ai_bot.config.settings import BARD_API_KEY, logger
 
 bard = BardAsync(timeout=30, token=BARD_API_KEY)
@@ -38,4 +39,4 @@ async def get_response_from_bard(input_text, func_name='') -> str:
 
 
 if __name__ == '__main__':
-    asyncio.run(get_response_from_bard('Who is Wolverine? Please show images'))
+    asyncio.run(get_response_from_bard('Who is Wolverine?'))
