@@ -28,7 +28,7 @@ async def get_response_from_bard(input_text, func_name='') -> str:
     try:
         # input_text += '\nPlease refrain from using any images.'
         # Send an API request and get a response.
-        response = await bard.get_answer(input_text)
+        response = await bard.get_answer(input_text=input_text, func_name=func_name)
         # print(f"{response['content']}\n\n")
         # print(f"{response['images']}\n\n")
         # print(f"{response['links']}\n\n")

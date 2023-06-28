@@ -13,6 +13,7 @@ from re import search
 from bardapi.constants import ALLOWED_LANGUAGES, SESSION_HEADERS
 from deep_translator import GoogleTranslator
 from httpx import AsyncClient
+from telegram_ai_bot.config.settings import logger
 
 
 class BardAsync:
@@ -20,6 +21,7 @@ class BardAsync:
     Bard class for interacting with the Bard API using httpx[http2]
     Tested and working (could break in the future, if not kept up to date)
     """
+    cls_name = 'BardAsync'
 
     def __init__(
             self,
@@ -57,7 +59,7 @@ class BardAsync:
         self.language = language or os.getenv("_BARD_API_LANG", "en")
         self.run_code = run_code or False
 
-    async def get_answer(self, input_text: str) -> dict:
+    async def get_answer(self, input_text: str, func_name='') -> dict:
         """
         Get an answer from the Bard API for the given input text.
 
@@ -68,6 +70,7 @@ class BardAsync:
         >>> print(response['content'])
 
         Args:
+            func_name: Function name from which the call originated from
             input_text (str): Input text for the query.
 
         Returns:
@@ -83,6 +86,7 @@ class BardAsync:
                     "imgaes": set
                 }
         """
+        func_name = f'{func_name}.{self.cls_name}.get_answer' if func_name else f'{self.cls_name}.get_answer'
         if not isinstance(self.SNlM0e, str):
             self.SNlM0e = await self.SNlM0e
         params = {
@@ -117,6 +121,9 @@ class BardAsync:
             cookies={"__Secure-1PSID": self.token},
         )
 
+        logger.info(f'{func_name} :: resp -> {resp}')
+        logger.info(f'{func_name} :: resp.content -> {resp.content}')
+
         # Post-processing of response
         resp_dict = json.loads(resp.content.splitlines()[3])[0][2]
 
@@ -136,6 +143,11 @@ class BardAsync:
                         #  handle exception using logging instead
                         print(f"Unable to parse image from the response: {e}")
         parsed_answer = json.loads(resp_dict)
+
+        print('\n*********************************************************\n')
+        print(parsed_answer)
+        logger.info(f'{func_name} :: parsed_answer -> {parsed_answer}')
+        print('\n*********************************************************\n')
 
         # Translated by Google Translator (optional)
         if self.language is not None and self.language not in ALLOWED_LANGUAGES:
@@ -191,6 +203,7 @@ class BardAsync:
 
         print('\n*********************************************************\n')
         print(bard_answer)
+        logger.info(f'{func_name} :: bard_answer -> {bard_answer}')
         print('\n*********************************************************\n')
 
         return bard_answer
