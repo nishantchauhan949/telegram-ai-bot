@@ -147,12 +147,12 @@ class BardAsync:
 
         # Get code
         try:
-            code = parsed_answer[0][0].split("```")[1][6:]
+            code = parsed_answer[4][0][1][0].split("```")[1][6:]
         except Exception as e:
             # TODO:
             #  handle exception using logging instead
             code = None
-            print(f"Unable to parse answer from the response: {e}")
+            print(f"Unable to parse code from the response: {e}")
 
         # Returned dictionary object
         bard_answer = {
@@ -176,18 +176,23 @@ class BardAsync:
         self._reqid += 100000
 
         # Execute Code
-        if self.run_code and bard_answer['code'] is not None:
-            try:
-                print(bard_answer["code"])
-                # TODO:
-                #  find a way to handle this following warning
-                #  EX100: Use of builtin exec function for dynamic input is insecure and can leave your application
-                #  open to arbitrary code execution. Found in 'exec(bard_answer['code'])'.
-                exec(bard_answer["code"])
-            except Exception as e:
-                # TODO:
-                #  handle exception using logging instead
-                print(f"Unable to execute the code: {e}")
+        # if self.run_code and bard_answer['code'] is not None:
+        #     try:
+        #         print(bard_answer["code"])
+        #         # TODO:
+        #         #  find a way to handle this following warning
+        #         #  EX100: Use of builtin exec function for dynamic input is insecure and can leave your application
+        #         #  open to arbitrary code execution. Found in 'exec(bard_answer['code'])'.
+        #         exec(bard_answer["code"])
+        #     except Exception as e:
+        #         # TODO:
+        #         #  handle exception using logging instead
+        #         print(f"Unable to execute the code: {e}")
+
+        print('\n*********************************************************\n')
+        print(bard_answer)
+        print('\n*********************************************************\n')
+
         return bard_answer
 
     async def _get_snim0e(self):

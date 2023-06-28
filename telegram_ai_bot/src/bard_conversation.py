@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import asyncio
 
-from bardapi import BardAsync
-
+# from bardapi import BardAsync
+from telegram_ai_bot.src.core_async import BardAsync
 from telegram_ai_bot.config.settings import BARD_API_KEY, logger
 
 bard = BardAsync(timeout=30, token=BARD_API_KEY)
