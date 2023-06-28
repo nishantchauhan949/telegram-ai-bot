@@ -122,7 +122,9 @@ class BardAsync:
         )
 
         # logger.info(f'{func_name} :: resp -> {resp}')
+        print(f'{func_name} :: resp -> {resp}')
         # logger.info(f'{func_name} :: resp.content -> {resp.content}')
+        print(f'{func_name} :: resp.content -> {resp.content}')
 
         # Post-processing of response
         resp_dict = json.loads(resp.content.splitlines()[3])[0][2]
@@ -144,10 +146,8 @@ class BardAsync:
                         print(f"Unable to parse image from the response: {e}")
         parsed_answer = json.loads(resp_dict)
 
-        print('\n*********************************************************\n')
-        print(parsed_answer)
+        print(f'{func_name} :: parsed_answer -> {parsed_answer}')
         # logger.info(f'{func_name} :: parsed_answer -> {parsed_answer}')
-        print('\n*********************************************************\n')
 
         # Translated by Google Translator (optional)
         if self.language is not None and self.language not in ALLOWED_LANGUAGES:
@@ -201,10 +201,8 @@ class BardAsync:
         #         #  handle exception using logging instead
         #         print(f"Unable to execute the code: {e}")
 
-        print('\n*********************************************************\n')
-        print(bard_answer)
+        print(f'{func_name} :: parsed_answer -> {parsed_answer}')
         # logger.info(f'{func_name} :: bard_answer -> {bard_answer}')
-        print('\n*********************************************************\n')
 
         return bard_answer
 
