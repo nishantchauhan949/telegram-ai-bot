@@ -29,11 +29,12 @@ setup(
         "openai",
         "requests",
         "pyTelegramBotAPI",
-        "python-dotenv"
+        "python-dotenv",
+        "bard-api",
     ],
-    dependency_links=[
-        'git+https://github.com/dsdanielpark/Bard-API.git',
-    ],
+    # dependency_links=[
+    #     'git+https://github.com/dsdanielpark/Bard-API.git',
+    # ],
     keywords="Python, API, Bard, Google Bard, Large Language Model, Chatbot API, Google API, Chatbot",
     entry_points={"console_scripts": ["telegram_bot=src.ai_telegram_bot_async:main"]},
 )

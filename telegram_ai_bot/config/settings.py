@@ -21,5 +21,6 @@ logger.addHandler(sh)
 BARD_API_KEY = os.environ.get('BARD_API_KEY')
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+AUTH_PASSWORD = os.getenv("AUTH_PASSWORD")
 
 print(BOT_TOKEN)

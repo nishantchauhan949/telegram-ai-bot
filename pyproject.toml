@@ -106,7 +106,8 @@ dependencies = [
   "requests",
   "pyTelegramBotAPI",
   "python-dotenv",
-  "bardapi @ git+https://github.com/dsdanielpark/Bard-API.git"
+  "bardapi",
+#  "bardapi @ git+https://github.com/dsdanielpark/Bard-API.git"
 ]
 
 # List additional groups of dependencies here (e.g. development

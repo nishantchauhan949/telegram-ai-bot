@@ -12,6 +12,7 @@ Send /start to initiate the conversation.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
+from hashlib import sha512
 
 from telegram import __version__ as TG_VER
 
@@ -35,16 +36,21 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from telegram_ai_bot.config.settings import BOT_TOKEN, logger
+from telegram_ai_bot.config.settings import BOT_TOKEN, logger, AUTH_PASSWORD
 from telegram_ai_bot.src.bard_conversation import get_response_from_bard
 from telegram_ai_bot.src.chatgpt_apis import get_response_from_chatgpt
 
-BARD_QUERY, BARD_QUERY_RECURSION, CHATGPT_QUERY, CHATGPT_QUERY_RECURSION, BARD_OR_CHATGPT = range(5)
+AUTH, AUTH_RECURSION, BARD_QUERY, BARD_QUERY_RECURSION, CHATGPT_QUERY, CHATGPT_QUERY_RECURSION, BARD_OR_CHATGPT = range(
+    7
+)
 
 BARD_PROMPT = '/bard'
 CHATGPT_PROMPT = '/chatgpt'
 STOP_PROMPT = '/stop'
 CANCEL_PROMPT = '/cancel'
+
+authentication_retries = dict()
+all_users_authenticated = dict()
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name='') -> int:
@@ -70,8 +76,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, func_name=''
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
         logger.info(f'{prepend} Start prompt received from user')
-        text = """Please choose either /bard or /chatgpt, based on your preference.
-        
+        text = """To ask the AI bot, please provide the password"""
+        await update.message.reply_text(
+            text=text,
+        )
+        authentication_retries[user] = 3
+        all_users_authenticated[user] = False
+        return AUTH
+    except Exception as e:
+        logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
+        return ConversationHandler.END
+
+
+async def auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    async def calculate_sha512_hash(password):
+        sha512_hash = sha512()
+        sha512_hash.update(password.encode('utf-8'))
+        return sha512_hash.hexdigest()
+
+    func_name = 'auth()'
+    try:
+        user = update.message.from_user.first_name
+        prepend = f'{user} :: {func_name},'
+        user_given_password = update.message.text
+        while authentication_retries[user] > 0:
+            if await calculate_sha512_hash(password=user_given_password) == AUTH_PASSWORD:
+                text = """Please choose either /bard or /chatgpt, based on your preference.
+
 Some things to note:
 1. Bard can crawl the web to get latest information available but it can hallucinate.
 
@@ -80,11 +111,20 @@ Some things to note:
 3. Hallucination rate: Bard > ChatGPT
 
 4. You can use /stop and /cancel at any time to end the conversation."""
-        await update.message.reply_text(
-            text=text,
-        )
-
-        return BARD_OR_CHATGPT
+                await update.message.reply_text(text='You are successfully authenticated.')
+                await update.message.reply_text(text=text)
+                all_users_authenticated[user] = True
+                return BARD_OR_CHATGPT
+            else:
+                logger.info(f'{prepend} :: User gave wrong password: {user_given_password}')
+                authentication_retries[user] -= 1
+                if authentication_retries[user] > 0:
+                    await update.message.reply_text(text=f'You have {authentication_retries[user]} more tries.')
+                else:
+                    await update.message.reply_text(text=f"Fine! I'll give you one more try.")
+                return AUTH_RECURSION
+        await update.message.reply_text(text='Kidding! You can fuck right off!')
+        return ConversationHandler.END
     except Exception as e:
         logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
         return ConversationHandler.END
@@ -95,21 +135,27 @@ async def bard_or_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     try:
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
-        user_query = update.message.text
-        if user_query.startswith(BARD_PROMPT) or user_query.endswith(BARD_PROMPT):
-            logger.info(f'{prepend} User wants to chat with Bard')
-            await update.message.reply_text(
-                text="Bard will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
-            )
-            return BARD_QUERY
-        elif user_query.startswith(CHATGPT_PROMPT) or user_query.endswith(CHATGPT_PROMPT):
-            logger.info(f'{prepend} User wants to chat with ChatGPT')
-            await update.message.reply_text(
-                text="ChatGPT will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
-            )
-            return CHATGPT_QUERY
+        if all_users_authenticated[user]:
+            user_query = update.message.text
+            if user_query.startswith(BARD_PROMPT) or user_query.endswith(BARD_PROMPT):
+                logger.info(f'{prepend} User wants to chat with Bard')
+                await update.message.reply_text(
+                    text="Bard will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
+                )
+                return BARD_QUERY
+            elif user_query.startswith(CHATGPT_PROMPT) or user_query.endswith(CHATGPT_PROMPT):
+                logger.info(f'{prepend} User wants to chat with ChatGPT')
+                await update.message.reply_text(
+                    text="ChatGPT will take your prompts now.\n\nMake sure to use /stop after your conversation ends."
+                )
+                return CHATGPT_QUERY
+            else:
+                logger.info(f'{prepend} User ended the conversation')
+                all_users_authenticated[user] = False
+                return ConversationHandler.END
         else:
-            logger.info(f'{prepend} User ended the conversation')
+            logger.info(f'{prepend} User not authenticated')
+            await update.message.reply_text(text='You are not authenticated yet.')
             return ConversationHandler.END
     except Exception as e:
         logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
@@ -137,18 +183,24 @@ async def bard_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     try:
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
-        user_query = update.message.text
-        if user_query.startswith(STOP_PROMPT) or user_query.endswith(STOP_PROMPT) or \
-                user_query.startswith(CANCEL_PROMPT) or user_query.endswith(CANCEL_PROMPT):
-            logger.info(f'{prepend} User ended the conversation')
-            await cancel_handler(update=update, context=context)
+        if all_users_authenticated[user]:
+            user_query = update.message.text
+            if user_query.startswith(STOP_PROMPT) or user_query.endswith(STOP_PROMPT) or \
+                    user_query.startswith(CANCEL_PROMPT) or user_query.endswith(CANCEL_PROMPT):
+                logger.info(f'{prepend} User ended the conversation')
+                all_users_authenticated[user] = False
+                await cancel_handler(update=update, context=context)
+                return ConversationHandler.END
+            logger.info(f'{prepend} User Query :: {user_query}')
+            bard_response = await get_response_from_bard(input_text=user_query, func_name=func_name)
+            logger.info(f'{prepend} Response :: {bard_response}')
+            await update.message.reply_text(text="Here's your response!")
+            await update.message.reply_text(text=bard_response)
+            return BARD_QUERY_RECURSION
+        else:
+            logger.info(f'{prepend} User not authenticated')
+            await update.message.reply_text(text='You are not authenticated yet.')
             return ConversationHandler.END
-        logger.info(f'{prepend} User Query :: {user_query}')
-        bard_response = await get_response_from_bard(input_text=user_query, func_name=func_name)
-        logger.info(f'{prepend} Response :: {bard_response}')
-        await update.message.reply_text(text="Here's your response!")
-        await update.message.reply_text(text=bard_response)
-        return BARD_QUERY_RECURSION
     except Exception as e:
         logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
         return ConversationHandler.END
@@ -175,18 +227,24 @@ async def chatgpt_query_handler(update: Update, context: ContextTypes.DEFAULT_TY
     try:
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
-        user_query = update.message.text
-        if user_query.startswith(STOP_PROMPT) or user_query.endswith(STOP_PROMPT) or \
-                user_query.startswith(CANCEL_PROMPT) or user_query.endswith(CANCEL_PROMPT):
-            logger.info(f'{prepend} User ended the conversation')
-            await cancel_handler(update=update, context=context)
+        if all_users_authenticated[user]:
+            user_query = update.message.text
+            if user_query.startswith(STOP_PROMPT) or user_query.endswith(STOP_PROMPT) or \
+                    user_query.startswith(CANCEL_PROMPT) or user_query.endswith(CANCEL_PROMPT):
+                logger.info(f'{prepend} User ended the conversation')
+                all_users_authenticated[user] = False
+                await cancel_handler(update=update, context=context)
+                return ConversationHandler.END
+            logger.info(f'{prepend} User Query :: {user_query}')
+            chatgpt_response = await get_response_from_chatgpt(input_text=user_query, func_name=func_name)
+            logger.info(f'{prepend} Response :: {chatgpt_response}')
+            await update.message.reply_text(text="Here's your response!")
+            await update.message.reply_text(text=chatgpt_response)
+            return CHATGPT_QUERY_RECURSION
+        else:
+            logger.info(f'{prepend} User not authenticated')
+            await update.message.reply_text(text='You are not authenticated yet.')
             return ConversationHandler.END
-        logger.info(f'{prepend} User Query :: {user_query}')
-        chatgpt_response = await get_response_from_chatgpt(input_text=user_query, func_name=func_name)
-        logger.info(f'{prepend} Response :: {chatgpt_response}')
-        await update.message.reply_text(text="Here's your response!")
-        await update.message.reply_text(text=chatgpt_response)
-        return CHATGPT_QUERY_RECURSION
     except Exception as e:
         logger.error(f'{func_name} :: Some unexpected error occurred: {e}')
         return ConversationHandler.END
@@ -213,6 +271,7 @@ async def cancel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         user = update.message.from_user.first_name
         prepend = f'{user} :: {func_name},'
         logger.info(f'{prepend} conversation ended.')
+        all_users_authenticated[user] = False
         await update.message.reply_text("Bye! I hope we can talk again.")
         return ConversationHandler.END
     except Exception as e:
@@ -267,6 +326,8 @@ def main() -> None:
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler(command=['start', 'ask'], callback=start)],
             states={
+                AUTH: [MessageHandler(filters=filters.ALL, callback=auth)],
+                AUTH_RECURSION: [MessageHandler(filters=filters.ALL, callback=auth)],
                 BARD_OR_CHATGPT: [CommandHandler(command=['bard', 'chatgpt'], callback=bard_or_chatgpt)],
                 BARD_QUERY: [MessageHandler(filters=filters.ALL,
                                             callback=bard_query_handler)],
